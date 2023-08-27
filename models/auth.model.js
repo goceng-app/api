@@ -16,5 +16,23 @@ export default class AuthModel extends Model{
       throw error;
     }
   }
+  async signup(userData) {
+    const connection = await this.pool.getConnection();
+    try {
+      const {
+        name, phone, password
+      } = userData;
+      await connection.beginTransaction();
+      const [rows] = await connection.query(`insert into customers (name, phone) values (?, ?)`, [name, phone]);
+      await connection.query(`insert into customerAuth (customerId, password) values (?, ?)`, [rows.insertId, password]);
+      await connection.commit();
+      connection.release();
+      return rows;
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      console.log(error);
+      throw error;
+    }
+  }
 }
-

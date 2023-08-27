@@ -31,12 +31,27 @@ export default class AuthController  {
       name, phone, password, passwordConfirm
     } = req.body
     try {
+      if(!name || !phone || !password || !passwordConfirm) throw new Error('item required');
       if(password !== passwordConfirm) throw new Error('pass should be same');
-      if(!name || !phone || !password) throw new Error('item required');
-
+      const authModel = new AuthModel;
+      const user = await authModel.customerDetail(phone);
+      if(user) throw new Error('User exist, please login');
+      const hashedPassword = await bcrypt.hash(password, 0);
+      await authModel.signup({
+        name, phone, password : hashedPassword,
+      });
+      return res.json({ message : 'Succesfully signed up' });
     } catch (error) {
       console.error(error);
-      res.status(500).send('Server error');
+      res.status(500).json(error.message);
+    }
+  }
+  async forgotPassword(req, res) {
+    try {
+      res.send('ok');
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(error.message);
     }
   }
 }
