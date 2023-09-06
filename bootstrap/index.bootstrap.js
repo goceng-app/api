@@ -62,7 +62,7 @@ export default class Loaders {
     await this.setupRedis();
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
-    this.setupRoutes();
     this.app.use(cors());
+    this.setupRoutes();
   }
 }
